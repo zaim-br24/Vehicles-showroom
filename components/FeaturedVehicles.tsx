@@ -31,10 +31,10 @@ export default function FeaturedVehicles() {
   }, []);
 
   return (
-    <section className="fade-in py-24 bg-gray-50">
+    <section className="fade-in py-10 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
         <h2 className="text-4xl font-bold mb-16 text-center">
-          Featured Trucks
+          certains de nos véhicules
         </h2>
 
         <div className="grid md:grid-cols-3 gap-8">

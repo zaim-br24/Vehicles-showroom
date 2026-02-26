@@ -23,7 +23,7 @@ export default function CategoriesSection() {
   return (
     <section id="categories" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl font-bold mb-12 text-center">Our Categories</h2>
+        <h2 className="text-4xl font-bold mb-12 text-center">Nos véhicules</h2>
 
         <div className="grid md:grid-cols-3 gap-8">
           {categories.map((cat) => (
@@ -31,7 +31,7 @@ export default function CategoriesSection() {
               <div className="relative overflow-hidden rounded-2xl cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300">
                 <img
                   src={cat.image.url}
-                  className="w-full h-64 object-cover brightness-75"
+                  className="w-full h-50 object-cover brightness-75"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <h3 className="text-xl font-semibold text-white">

@@ -9,12 +9,12 @@ export default function Navbar() {
     <nav className="bg-[rgb(28,28,26)] text-white shadow-md">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-[rgb(235,168,61)]">
-          MZ Trucks
+          MZ <span className="text-white">Trucks</span>
         </Link>
 
         <div className="hidden md:flex gap-6">
           <Link href="/" className="hover:text-[rgb(235,168,61)] transition">
-            Home
+            Accueil
           </Link>
           <Link
             href="/contact"
@@ -26,7 +26,7 @@ export default function Navbar() {
             href="/about"
             className="hover:text-[rgb(235,168,61)] transition"
           >
-            Who We Are?
+            qui-sommes-nous?
           </Link>
         </div>
 
