@@ -1,5 +1,7 @@
 @import "tailwindcss";
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   --primary: rgb(235, 168, 61);
   --dark: rgb(28, 28, 26);

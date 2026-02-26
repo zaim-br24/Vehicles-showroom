@@ -1,132 +1,107 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-
-interface Vehicle {
-  _id: string;
-  title: { en: string };
-  description?: { en: string };
-  thumbnail: { url: string };
-  gallery: { url: string }[];
-  specs: { year: number; fuel?: string; engine?: string };
-  category: { _id: string; name: { en: string } };
-}
+import { useParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function VehicleDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const vehicleId = params.id;
 
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [vehicle, setVehicle] = useState<any>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchVehicle = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/vehicles/${vehicleId}`,
-        );
-        const data: Vehicle = await res.json();
-        setVehicle(data);
-      } catch (err) {
-        console.error("Error fetching vehicle:", err);
-      }
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/vehicles/${vehicleId}`,
+      );
+      const data = await res.json();
+      setVehicle(data);
     };
+
     fetchVehicle();
   }, [vehicleId]);
 
-  if (!vehicle) return <p className="p-6">Loading vehicle details...</p>;
+  if (!vehicle) return <div className="p-10">Loading...</div>;
 
-  const images = [vehicle.thumbnail.url, ...vehicle.gallery.map((g) => g.url)];
+  const images = [
+    vehicle.thumbnail?.url,
+    ...(vehicle.gallery?.map((g: any) => g.url) || []),
+  ].filter(Boolean);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-24">
-      <button
-        onClick={() => router.back()}
-        className="mb-8 text-[rgb(28,28,26)] font-semibold hover:underline"
-      >
-        ← Back
-      </button>
+    <div className="max-w-5xl mx-auto px-4 md:px-6 py-16">
+      {/* MAIN IMAGE */}
+      <div className="relative h-[300px] sm:h-[400px] md:h-[500px] overflow-hidden flex items-center justify-center ">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentIndex}
+            src={images[currentIndex]}
+            alt="vehicle"
+            className="w-full h-full  object-contain object-center shadow-lg"
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          />
+        </AnimatePresence>
+      </div>
 
-      <div className="grid md:grid-cols-2 gap-12 items-start">
-        {/* Left: Gallery */}
-        <div className="flex flex-col items-center">
-          {/* Main Image */}
-          <div className="w-full md:w-[28rem] h-[28rem] mb-4 rounded-2xl overflow-hidden shadow-lg">
+      {/* THUMBNAILS */}
+      <div className="mt-2 flex gap-1 justify-center flex-wrap">
+        {images.map((img: string, index: number) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-15 h-15 sm:w-20 sm:h-20 rounded-md overflow-hidden border-2 transition-all duration-300 ${
+              currentIndex === index
+                ? "border-yellow-500 scale-105"
+                : "border-gray-300 hover:border-yellow-400"
+            }`}
+          >
             <img
-              src={images[currentIndex]}
-              alt={vehicle.title.en}
+              src={img}
+              alt="thumbnail"
               className="w-full h-full object-cover object-center"
             />
-          </div>
+          </button>
+        ))}
+      </div>
 
-          {/* Thumbnails */}
-          <div className="flex gap-4 overflow-x-auto">
-            {images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition ${
-                  currentIndex === idx
-                    ? "border-[rgb(235,168,61)]"
-                    : "border-gray-300 hover:border-[rgb(235,168,61)]"
-                }`}
-              >
-                <img
-                  src={img}
-                  alt={`${vehicle.title.en} ${idx}`}
-                  className="w-full h-full object-cover object-center"
-                />
-              </button>
-            ))}
-          </div>
+      {/* VEHICLE INFO */}
+      <div className="mt-12 grid gap-6 md:grid-cols-2">
+        {/* DESCRIPTION BOX */}
+        <div className="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-100">
+          <h2 className="text-lg font-semibold mb-4">Description</h2>
+          <p className="text-gray-600 leading-relaxed">
+            {vehicle.description?.en}
+          </p>
         </div>
 
-        {/* Right: Vehicle Details */}
-        <div className="flex flex-col justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              {vehicle.title.en}
-            </h1>
-            <p className="text-gray-700 mb-6">{vehicle.description?.en}</p>
+        {/* SPECS BOX */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h2 className="text-lg font-semibold mb-4">Specifications</h2>
 
-            <div className="mb-6 bg-gray-50 p-6 rounded-2xl shadow-inner">
-              <h2 className="text-2xl font-semibold mb-4 text-[rgb(28,28,26)]">
-                Vehicle Specs
-              </h2>
-              <ul className="space-y-2 text-gray-800">
-                <li>
-                  <span className="font-semibold">Year:</span>{" "}
-                  {vehicle.specs.year}
-                </li>
-                {vehicle.specs.fuel && (
-                  <li>
-                    <span className="font-semibold">Fuel:</span>{" "}
-                    {vehicle.specs.fuel}
-                  </li>
-                )}
-                {vehicle.specs.engine && (
-                  <li>
-                    <span className="font-semibold">Engine:</span>{" "}
-                    {vehicle.specs.engine}
-                  </li>
-                )}
-                <li>
-                  <span className="font-semibold">Category:</span>{" "}
-                  {vehicle.category.name.en}
-                </li>
-              </ul>
+          <div className="space-y-3 text-gray-700 text-sm">
+            <div className="flex justify-between">
+              <span className="font-medium">Year</span>
+              <span>{vehicle.specs?.year}</span>
             </div>
-          </div>
 
-          <Link
-            href={`/categories/${vehicle.category._id}`}
-            className="mt-6 w-full py-3 bg-[rgb(235,168,61)] text-black text-center font-semibold rounded-xl hover:opacity-90 transition"
-          >
-            More in {vehicle.category.name.en}
-          </Link>
+            {vehicle.specs?.fuel && (
+              <div className="flex justify-between">
+                <span className="font-medium">Fuel</span>
+                <span>{vehicle.specs.fuel}</span>
+              </div>
+            )}
+
+            {vehicle.specs?.engine && (
+              <div className="flex justify-between">
+                <span className="font-medium">Engine</span>
+                <span>{vehicle.specs.engine}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
