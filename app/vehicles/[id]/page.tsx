@@ -2,14 +2,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-
+import loader from "./loader";
 export default function VehicleDetailsPage() {
   const params = useParams();
   const vehicleId = params.id;
 
   const [vehicle, setVehicle] = useState<any>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchVehicle = async () => {
       const res = await fetch(
@@ -18,13 +19,17 @@ export default function VehicleDetailsPage() {
       const data = await res.json();
       console.log("Fetched vehicle:", data);
       setVehicle(data);
+      setLoading(false);
     };
 
     fetchVehicle();
   }, [vehicleId]);
-
-  if (!vehicle) return <div className="p-10">Loading...</div>;
-
+// Show loader if vehicle data is not yet available
+  {
+    if (loading || !vehicle) {
+      return loader();
+    }
+  }
   const images = [
     vehicle.thumbnail?.url,
     ...(vehicle.gallery?.map((g: any) => g.url) || []),
